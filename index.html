@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perps Lens</title>
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #131822; --line: #232a38; --text: #e6e9ef; --muted: #8a93a6;
+    --accent: #7c5cff; --up: #22c55e; --down: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .panel { margin-bottom: 20px; overflow-x: auto; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  input { flex: 1 1 320px; min-width: 0; background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; font: inherit; font-family: ui-monospace, monospace; font-size: 13px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font: inherit; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; }
+  th:first-child, td:first-child { text-align: left; }
+  tr.click { cursor: pointer; } tr.click:hover { background: #1a2030; }
+  .up { color: var(--up); } .down { color: var(--down); } .muted { color: var(--muted); }
+  .note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .group h3 { font-size: 13px; color: var(--muted); font-weight: 500; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .chip { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .chip:last-child { border-bottom: 0; }
+  .badge { font-size: 12px; vertical-align: middle; background: #f59e0b; color: #000; border-radius: 6px; padding: 2px 8px; margin-left: 8px; }
+  #order input, select { flex: 0 1 140px; }
+  select { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: inherit; }
+  button.ghost { background: transparent; border: 1px solid var(--accent); color: var(--text); }
+  a { color: var(--accent); }
+  button.small { padding: 4px 10px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Perps Lens<span id="net" class="badge" hidden>TESTNET</span></h1>
+  <p class="sub" id="sub">Ончейн-перпы на Solana рядом с твоей CEX. Живые данные Pacifica, только просмотр, без ключей. <a href="?net=testnet">Попробовать торговлю на testnet →</a></p>
+
+  <div class="stats">
+    <div class="stat"><b id="s-vol">…</b><span>объём Pacifica за 24ч</span></div>
+    <div class="stat"><b id="s-markets">…</b><span>рынков</span></div>
+    <div class="stat"><b id="s-tradfi">…</b><span>из них не крипта: акции, сырьё, валюты</span></div>
+  </div>
+
+  <section class="panel" id="trade" hidden>
+    <h2>Торговля</h2>
+    <form id="order">
+      <button type="button" id="connect" class="ghost">Подключить Phantom</button>
+      <select id="o-symbol"></select>
+      <select id="o-side"><option value="bid">Long</option><option value="ask">Short</option></select>
+      <input id="o-size" placeholder="Размер, монет" inputmode="decimal" autocomplete="off">
+      <input id="o-slip" value="0.5" title="Проскальзывание, %" inputmode="decimal" autocomplete="off">
+      <button>Отправить</button>
+    </form>
+    <div id="o-status" class="note">Подключи Phantom, чтобы торговать. Каждый ордер подписывается в кошельке.</div>
+    <p class="note"><b>Подключай отдельный пустой кошелёк.</b> Подпись Pacifica не указывает сеть и 30 секунд действительна и на mainnet, поэтому не подписывай здесь кошельком с реальным депозитом на Pacifica. Тестовые средства: devnet SOL и USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).</p>
+  </section>
+
+  <section class="panel">
+    <h2>Позиции кошелька</h2>
+    <form id="f">
+      <input id="wallet" placeholder="Solana-адрес кошелька" autocomplete="off" spellcheck="false">
+      <button>Показать</button>
+    </form>
+    <div id="positions" class="note">Введи адрес или кликни трейдера в таблице ниже.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Топ трейдеров Pacifica</h2>
+    <div id="leaders" class="note">Загрузка…</div>
+  </section>
+
+  <section class="panel">
+    <h2>Не только крипта</h2>
+    <div id="tradfi" class="groups note">Загрузка…</div>
+  </section>
+</main>
+<script type="module">
+import { signedBody } from "./pacifica-sign.js";
+
+const TEST_API = "https://test-api.pacifica.fi/api/v1";
+// Trading exists only on testnet: ?net=testnet switches the whole page, mainnet stays read-only.
+const TESTNET = new URLSearchParams(location.search).get("net") === "testnet";
+const API = TESTNET ? TEST_API : "https://api.pacifica.fi/api/v1";
+// Non-crypto markets on Pacifica, grouped for display.
+const TRADFI = {
+  "Акции": ["NVDA", "TSLA", "GOOGL", "META", "PLTR", "HOOD", "MSTR", "CRCL", "MU", "SNDK", "SAMSUNG", "SKHYNIX", "SPCX"],
+  "Сырьё": ["XAU", "XAG", "PLATINUM", "COPPER", "CL", "NATGAS", "URNM"],
+  "Валюты и индексы": ["EURUSD", "USDJPY", "SP500"],
+};
+
+let marks = {}, markets = {}, trader = null;
+
+async function api(path) {
+  const r = await fetch(`${API}/${path}`);
+  const body = await r.json();
+  if (!body.success) throw new Error(body.error || r.status);
+  return body.data;
+}
+
+const usd = (n, d = 0) => (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const compact = n => "$" + Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+const cls = n => (n >= 0 ? "up" : "down");
+const short = a => a.slice(0, 4) + "…" + a.slice(-4);
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+
+async function loadMarkets() {
+  const prices = await api("info/prices");
+  marks = Object.fromEntries(prices.map(p => [p.symbol, +p.mark]));
+  const bySym = Object.fromEntries(prices.map(p => [p.symbol, p]));
+  const tradfi = Object.values(TRADFI).flat().filter(s => bySym[s]);
+  document.getElementById("s-vol").textContent = compact(prices.reduce((a, p) => a + +p.volume_24h, 0));
+  document.getElementById("s-markets").textContent = prices.length;
+  document.getElementById("s-tradfi").textContent = tradfi.length;
+
+  document.getElementById("tradfi").innerHTML = Object.entries(TRADFI).map(([name, syms]) => `
+    <div class="group"><h3>${name}</h3>${syms.filter(s => bySym[s]).map(s => {
+      const p = bySym[s], chg = (+p.mark / +p.yesterday_price - 1) * 100;
+      return `<div class="chip"><span>${s}</span><span>${(+p.mark).toLocaleString("en-US")} <span class="${cls(chg)}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</span></span></div>`;
+    }).join("")}</div>`).join("");
+  document.getElementById("tradfi").classList.remove("note");
+}
+
+async function loadLeaders() {
+  const rows = await api("leaderboard?limit=10");
+  document.getElementById("leaders").innerHTML = `<table>
+    <tr><th>Трейдер</th><th>PnL 30д</th><th>PnL всё время</th><th>Объём 30д</th><th>Капитал</th></tr>
+    ${rows.map(r => `<tr class="${r.privacy_mode ? "" : "click"}" data-addr="${r.privacy_mode ? "" : esc(r.address)}">
+      <td>${esc(r.username || short(r.address))}${r.privacy_mode ? ' <span class="muted">🔒</span>' : ""}</td>
+      <td class="${cls(+r.pnl_30d)}">${usd(+r.pnl_30d)}</td>
+      <td class="${cls(+r.pnl_all_time)}">${usd(+r.pnl_all_time)}</td>
+      <td>${compact(+r.volume_30d)}</td>
+      <td>${compact(+r.equity_current)}</td></tr>`).join("")}
+  </table><p class="note">Кликни трейдера, чтобы увидеть его позиции. 🔒 — трейдер скрыл позиции.</p>`;
+  document.querySelectorAll("tr.click").forEach(tr => tr.onclick = () => {
+    document.getElementById("wallet").value = tr.dataset.addr;
+    showPositions(tr.dataset.addr);
+    document.getElementById("wallet").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+async function showPositions(wallet) {
+  const out = document.getElementById("positions");
+  out.className = "note";
+  out.textContent = "Загрузка…";
+  try {
+    const rows = await api(`positions?account=${encodeURIComponent(wallet)}`);
+    if (!rows.length) { out.textContent = "Открытых позиций нет."; return; }
+    let total = 0;
+    const canClose = TESTNET && wallet === trader;
+    const body = rows.map(p => {
+      const size = +p.amount, entry = +p.entry_price, mark = marks[p.symbol] ?? entry;
+      const long = p.side === "bid", pnl = (mark - entry) * size * (long ? 1 : -1);
+      total += pnl;
+      const close = canClose ? `<td><button class="small" data-sym="${esc(p.symbol)}" data-side="${long ? "ask" : "bid"}" data-amt="${esc(p.amount)}">Закрыть</button></td>` : "";
+      return `<tr><td>${esc(p.symbol)}</td><td class="${long ? "up" : "down"}">${long ? "long" : "short"}</td>
+        <td>${size.toLocaleString("en-US")}</td><td>${compact(size * mark)}</td>
+        <td>${entry.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+        <td>${mark.toLocaleString("en-US", { maximumFractionDigits: 4 })}</td>
+        <td class="${cls(pnl)}">${usd(pnl, 2)}</td>${close}</tr>`;
+    }).join("");
+    out.className = "";
+    out.innerHTML = `<table>
+      <tr><th>Рынок</th><th>Сторона</th><th>Размер</th><th>Объём</th><th>Вход</th><th>Сейчас</th><th>PnL</th>${canClose ? "<th></th>" : ""}</tr>
+      ${body}
+      <tr><td colspan="6"><b>Итого нереализованный PnL</b></td><td class="${cls(total)}"><b>${usd(total, 2)}</b></td>${canClose ? "<td></td>" : ""}</tr>
+    </table><p class="note">PnL по текущей цене, без учёта накопленного funding.</p>`;
+    out.querySelectorAll("[data-sym]").forEach(b => b.onclick = () => placeOrder(b.dataset.sym, b.dataset.side, b.dataset.amt, true));
+  } catch (e) {
+    out.textContent = "Не удалось загрузить: " + e.message;
+  }
+}
+
+document.getElementById("f").onsubmit = e => {
+  e.preventDefault();
+  const w = document.getElementById("wallet").value.trim();
+  if (w) showPositions(w);
+};
+
+const status = t => document.getElementById("o-status").textContent = t;
+
+async function placeOrder(symbol, side, amount, reduce_only) {
+  if (API !== TEST_API) throw new Error("Trading is testnet-only");
+  const m = markets[symbol], lot = +m.lot_size, dec = (m.lot_size.split(".")[1] || "").length;
+  amount = (Math.floor(+amount / lot + 1e-9) * lot).toFixed(dec);
+  if (!reduce_only && !(+amount * (marks[symbol] || 0) >= +m.min_order_size))
+    return status(`Минимальный ордер — $${m.min_order_size}. Увеличь размер.`);
+  status("Подтверди ордер в Phantom…");
+  try {
+    const data = { symbol, amount, side, slippage_percent: document.getElementById("o-slip").value.trim() || "0.5",
+      reduce_only, client_order_id: crypto.randomUUID() };
+    const body = await signedBody({ type: "create_market_order", data, account: trader,
+      signMessage: async msg => (await window.phantom.solana.signMessage(msg, "utf8")).signature });
+    const r = await fetch(`${TEST_API}/orders/create_market`, { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const res = await r.json();
+    status(res.success ? `Ордер принят: ${reduce_only ? "закрытие" : side === "bid" ? "long" : "short"} ${amount} ${symbol}.`
+      : "Pacifica отклонила: " + res.error);
+  } catch (e) {
+    status(e.code === 4001 ? "Отменено в кошельке." : "Ошибка: " + e.message);
+  }
+  showPositions(trader);
+}
+
+async function initTrading() {
+  document.getElementById("net").hidden = false;
+  document.getElementById("trade").hidden = false;
+  document.getElementById("sub").textContent = "Testnet Pacifica: ордера подписываются в твоём Phantom, ключи не покидают кошелёк.";
+  markets = Object.fromEntries((await api("info")).map(m => [m.symbol, m]));
+  document.getElementById("o-symbol").innerHTML = Object.keys(markets).sort()
+    .map(s => `<option${s === "SOL" ? " selected" : ""}>${esc(s)}</option>`).join("");
+  document.getElementById("connect").onclick = async () => {
+    const phantom = window.phantom?.solana;
+    if (!phantom?.isPhantom) return status("Phantom не найден: установи расширение Phantom (phantom.com) и обнови страницу. Как локальный файл страница не работает — только через http(s).");
+    try {
+      trader = (await phantom.connect()).publicKey.toString();
+    } catch { return status("Подключение отменено."); }
+    document.getElementById("wallet").value = trader;
+    document.getElementById("connect").textContent = short(trader);
+    status("Кошелёк подключён. Выбери рынок, сторону и размер.");
+    showPositions(trader);
+  };
+  document.getElementById("order").onsubmit = e => {
+    e.preventDefault();
+    if (!trader) return status("Сначала подключи Phantom.");
+    const size = document.getElementById("o-size").value.trim().replace(",", ".");
+    if (!(+size > 0)) return status("Укажи размер больше нуля.");
+    placeOrder(document.getElementById("o-symbol").value, document.getElementById("o-side").value, size, false);
+  };
+}
+
+if (TESTNET) initTrading().catch(e => status("Ошибка: " + e.message));
+loadMarkets().catch(e => document.getElementById("tradfi").textContent = "Ошибка: " + e.message);
+loadLeaders().catch(e => document.getElementById("leaders").textContent = "Ошибка: " + e.message);
+</script>
+</body>
+</html>
