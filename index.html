@@ -355,7 +355,7 @@
   <div class="wrap" role="tablist">
     <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
     <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
-    <button type="button" role="tab" data-tab="nexus" aria-controls="tab-nexus" title="Nexus Flow by PantheonX">Order Flow</button>
+    <button type="button" role="tab" data-tab="order-flow" aria-controls="tab-order-flow" title="Nexus Flow by PantheonX">Order Flow</button>
   </div>
 </nav>
 
@@ -503,7 +503,7 @@
       </section>
     </section>
   </div>
-  <div id="tab-nexus" role="tabpanel" hidden>
+  <div id="tab-order-flow" role="tabpanel" hidden>
     <!-- PantheonX's order-flow tool, embedded as is: their code and server, not ours. -->
     <iframe id="nexus" title="Nexus Flow" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
   </div>
@@ -1191,7 +1191,7 @@ if (FRAMED) {
 }
 
 // ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
-const TABS = ["trade", "market", "nexus"];
+const TABS = ["trade", "market", "order-flow"];
 const NEXUS = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com/nexus";
 let tab = null;
 function openConn() { if (!FRAMED && !$("conn-dlg").open) $("conn-dlg").showModal(); }
@@ -1203,7 +1203,7 @@ function show(name) {
   for (const b of document.querySelectorAll("#tabs [data-tab]")) b.setAttribute("aria-selected", b.dataset.tab === name);
   for (const p of document.querySelectorAll("[role=tabpanel]")) p.hidden = p.id !== "tab-" + name;
   history.replaceState(null, "", location.pathname + location.search + "#" + name);
-  if (name === "nexus" && !$("nexus").src) $("nexus").src = NEXUS + "/?api=" + encodeURIComponent(NEXUS); // load only when first opened
+  if (name === "order-flow" && !$("nexus").src) $("nexus").src = NEXUS + "/?api=" + encodeURIComponent(NEXUS); // load only when first opened
   if (name === "market" && (!fund.at || Date.now() - fund.at > 60000)) loadFunding();
 }
 document.addEventListener("click", e => {
