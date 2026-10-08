@@ -38,8 +38,7 @@
   .vn { font-weight: 800; }
   .vn.pac { color: var(--pacifica); } .vn.bn { color: var(--binance); }
 
-  /* Venue badges: one per venue, frame = network of the connected client. */
-  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* Venue badges: frame = network of the connected client. */
   .badge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
     border: 1px solid var(--line); color: var(--muted); white-space: nowrap; letter-spacing: .02em; }
   .badge.real { border-color: var(--mainnet); color: #fff; background: rgba(255, 107, 107, .16); }
@@ -51,6 +50,35 @@
   .badge.real .nw { color: #fff; } .badge.test .nw { color: var(--testnet); }
   .badge.off .vn { color: var(--muted); }
   .badge.off .logo { filter: grayscale(1); opacity: .55; }
+
+  /* Connections pill (top right, like Connect Wallet on DEXes): accent "Connect" when empty, one chip per connected venue otherwise. */
+  .conn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 5px 16px; }
+  .conn.on { background: var(--deep); border-color: var(--line); color: var(--text); padding: 4px 6px; }
+  .conn.on:hover { border-color: var(--accent-hi); background: var(--deep); }
+  .conn .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 3px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .04em; color: var(--testnet); border: 1px dashed rgba(180, 172, 240, .45); }
+  .conn .chip.real { color: #fff; background: rgba(255, 107, 107, .16); border: 1px solid var(--mainnet); }
+  .conn .plus { width: 28px; height: 28px; display: inline-grid; place-items: center; border-radius: 50%; color: var(--muted); font-size: 18px; font-weight: 600; line-height: 1; }
+  .conn.on:hover .plus { color: var(--head); }
+
+  /* Connections dialog: the two account cards, opened from the pill. */
+  #conn-dlg { width: min(880px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 1px solid var(--line); border-radius: 20px; background: var(--bg); color: var(--text); }
+  #conn-dlg::backdrop { background: rgba(8, 8, 14, .66); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  #conn-dlg[open] { animation: dlg-in 220ms var(--ease-out); }
+  @keyframes dlg-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+  .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 22px 0; }
+  .dlg-head h2 { margin: 0; font-size: 18px; }
+  .dlg-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .dlg-x { width: 36px; height: 36px; padding: 0; display: grid; place-items: center; font-size: 20px; font-weight: 500; }
+  #conn-dlg #accounts { padding: 18px 22px 22px; }
+
+  /* Theon, the PantheonX mascot: onboarding (cyan = "act on plan") and risk notes (amber = "check the risks"), per the brand book. */
+  .theon { display: block; height: auto; pointer-events: none; user-select: none; }
+  .empty-card.has-theon { grid-template-columns: auto minmax(0, 440px); justify-content: center; justify-items: start; text-align: left; column-gap: 36px; }
+  .empty-card .theon { grid-row: 1 / span 4; width: 132px; filter: drop-shadow(0 0 22px rgba(0, 245, 255, .28)); }
+  .empty-card.has-theon .venues-mini { justify-content: flex-start; }
+  .theon-warn { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 4px; border-radius: 12px; background: rgba(240, 185, 11, .07); border: 1px solid rgba(240, 185, 11, .28); }
+  .theon-warn .theon { width: 40px; flex: none; filter: drop-shadow(0 0 8px rgba(253, 191, 28, .35)); }
+  .warn-line.theon-warn b::before { content: none; }
 
   /* Language switch */
   #lang { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--deep); border: 1px solid var(--line); }
@@ -271,11 +299,11 @@
   @media (max-width: 560px) {
     .wrap { padding: 0 16px; }
     body > header .wrap { padding-top: 16px; padding-bottom: 14px; gap: 12px; }
-    .brand { flex: 1 1 0; min-width: 0; }
+    .brand { flex: 1 1 calc(100% - 150px); min-width: 0; }
     .head-tools { display: contents; }
     #lang { order: 1; align-self: flex-start; }
+    .conn { order: 2; margin-left: auto; }
     #lang button { min-height: 38px; padding: 4px 9px; }
-    .badges { order: 2; width: 100%; }
     #tabs .wrap { gap: 0; }
     #tabs button { flex: 1 1 0; justify-content: center; padding: 0 6px; font-size: 14px; }
     .panel { padding: 16px; }
@@ -283,6 +311,9 @@
     #balances { grid-template-columns: 1fr; }
     .acc-card { padding: 16px; }
     .empty-card { padding: 40px 16px; }
+    .empty-card.has-theon { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .empty-card .theon { grid-row: auto; width: 96px; }
+    .empty-card.has-theon .venues-mini { justify-content: center; }
     button, input, select, .seg label { min-height: 44px; }
     button.small { min-height: 44px; padding: 8px 16px; }
     .unit button { min-height: 0; padding: 6px 10px; }
@@ -311,7 +342,7 @@
       <div><h1>PantheonX</h1><p><span class="by">Perps Lens</span> · <span data-i18n="tagline"></span></p></div>
     </div>
     <div class="head-tools">
-      <div class="badges" id="badges"></div>
+      <button type="button" class="conn" id="conn" data-go="accounts"></button>
       <div id="lang" role="group" aria-label="Language">
         <button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button><button type="button" data-lang="uk">UK</button>
       </div>
@@ -322,14 +353,14 @@
 <nav id="tabs" data-i18n-aria="tabs_aria">
   <div class="wrap" role="tablist">
     <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
-    <button type="button" role="tab" data-tab="accounts" aria-controls="tab-accounts" id="tab-btn-accounts"><span data-i18n="tab_accounts"></span> <span class="alert" id="tab-alert" hidden></span></button>
     <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
   </div>
 </nav>
 
 <main class="wrap">
   <div id="tab-trade" role="tabpanel" hidden>
-    <section class="panel empty-card" id="trade-empty" hidden>
+    <section class="panel empty-card has-theon" id="trade-empty" hidden>
+      <img class="theon" src="img/theon-cyan.webp" width="132" height="240" alt="">
       <h2 data-i18n="empty_h"></h2>
       <p data-i18n="empty_p"></p>
       <div class="venues-mini"><span class="badge off"><svg class="logo" aria-hidden="true"><use href="#logo-pacifica"/></svg>Pacifica</span><span class="badge off"><svg class="logo" aria-hidden="true"><use href="#logo-binance"/></svg>Binance</span></div>
@@ -379,9 +410,12 @@
     </div>
   </div>
 
-  <div id="tab-accounts" role="tabpanel" hidden>
+  <dialog id="conn-dlg" aria-labelledby="conn-h">
+    <div class="dlg-head">
+      <div><h2 id="conn-h" data-i18n="tab_accounts"></h2><p data-i18n="conn_sub"></p></div>
+      <button type="button" class="ghost dlg-x" id="conn-x" data-i18n-aria="close_aria">×</button>
+    </div>
     <section id="accounts">
-      <h2 class="sr" data-i18n="tab_accounts"></h2>
       <div class="acc-grid">
         <article class="acc-card pac">
           <header>
@@ -415,7 +449,7 @@
             <button type="button" id="bn-connect" data-i18n="connect"></button>
             <button type="button" class="ghost" id="bn-disconnect" data-i18n="disconnect" hidden></button>
           </div>
-          <p class="warn-line" id="bn-warn" hidden><b data-i18n="bn_main_warn"></b></p>
+          <p class="warn-line theon-warn" id="bn-warn" hidden><img class="theon" src="img/theon-amber-head.webp" width="40" height="40" alt=""><b data-i18n="bn_main_warn"></b></p>
           <p class="warn-line"><b data-i18n="bn_warn"></b></p>
           <details>
             <summary data-i18n="bn_more"></summary>
@@ -424,7 +458,7 @@
         </article>
       </div>
     </section>
-  </div>
+  </dialog>
 
   <div id="tab-market" role="tabpanel" hidden>
     <section class="panel" id="funding">
@@ -480,7 +514,7 @@ import { fundingRows } from "./funding.js";
 const I18N = {
   en: {
     tagline: "Every side of the trade", net_real: "MAINNET — REAL MONEY", off: "not connected", tabs_aria: "Sections",
-    tab_trade: "Trade", tab_accounts: "Accounts", tab_market: "Market",
+    tab_trade: "Trade", tab_accounts: "Connections", conn_sub: "Each exchange connects on its own network", close_aria: "Close", tab_market: "Market",
     empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect Phantom (Pacifica) or a Binance API key first.",
     empty_btn: "Connect an exchange →",
     portfolio: "Portfolio", updated: "updated {time}", available: "available {amt} · {unit}",
@@ -493,7 +527,7 @@ const I18N = {
     order: "Order", size: "Size", unit_aria: "Size unit",
     hint_coin: "≈ {usd} · min {min} · step {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · min {min} · step {step}{cap}",
     hint_cap: " · Mainnet cap ${cap}",
-    e_framed: "Trading is off inside a frame.", e_connect: "Connect {venue} in the Accounts tab.",
+    e_framed: "Trading is off inside a frame.", e_connect: "Connect {venue} with the Connect button at the top.",
     e_demo: "Binance Demo doesn't accept orders from a browser (CORS), so it's view-only. Trade on Mainnet.",
     e_nomarket: "No market data yet, try again shortly.", e_stale: "Prices are stale, refreshing…",
     e_size: "Enter a size above zero.", e_mark: "No market price yet, try again shortly.",
@@ -544,11 +578,11 @@ const I18N = {
     lb_h: "Top Pacifica traders", lb_trader: "Trader", lb_30: "30d PnL", lb_all: "All-time PnL", lb_vol: "30d volume", lb_eq: "Equity",
     lb_note: "Click a trader to see their positions. 🔒 means the trader hides their positions.",
     tf_h: "Not just crypto", tf_stocks: "Stocks", tf_comm: "Commodities", tf_fx: "FX & indices",
-    footer: "Built by the PantheonX team · data: public Pacifica and Binance APIs",
+    footer: "Your exchange keys stay in this tab and go only to the exchange",
   },
   ru: {
     tagline: "Сделка со всех сторон", net_real: "MAINNET — РЕАЛЬНЫЕ ДЕНЬГИ", off: "не подключена", tabs_aria: "Разделы",
-    tab_trade: "Торговля", tab_accounts: "Аккаунты", tab_market: "Рынок",
+    tab_trade: "Торговля", tab_accounts: "Подключения", conn_sub: "Каждая биржа подключается в своей сети", close_aria: "Закрыть", tab_market: "Рынок",
     empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Phantom (Pacifica) или API-ключ Binance.",
     empty_btn: "Подключить биржу →",
     portfolio: "Портфель", updated: "обновлено {time}", available: "доступно {amt} · {unit}",
@@ -561,7 +595,7 @@ const I18N = {
     order: "Ордер", size: "Размер", unit_aria: "Единица размера",
     hint_coin: "≈ {usd} · мин. {min} · шаг {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · мин. {min} · шаг {step}{cap}",
     hint_cap: " · лимит Mainnet ${cap}",
-    e_framed: "Торговля во фрейме отключена.", e_connect: "Подключи {venue} во вкладке «Аккаунты».",
+    e_framed: "Торговля во фрейме отключена.", e_connect: "Подключи {venue} кнопкой «Подключить» вверху.",
     e_demo: "Binance Demo: ордера из браузера не принимаются (CORS) — только просмотр. Торговля — на Mainnet.",
     e_nomarket: "Нет данных рынка — обнови позже.", e_stale: "Цены устарели — обновляю…",
     e_size: "Укажи размер больше нуля.", e_mark: "Нет цены рынка — обнови позже.",
@@ -612,11 +646,11 @@ const I18N = {
     lb_h: "Топ трейдеров Pacifica", lb_trader: "Трейдер", lb_30: "PnL 30д", lb_all: "PnL всё время", lb_vol: "Объём 30д", lb_eq: "Капитал",
     lb_note: "Кликни трейдера, чтобы увидеть его позиции. 🔒 — трейдер скрыл позиции.",
     tf_h: "Не только крипта", tf_stocks: "Акции", tf_comm: "Сырьё", tf_fx: "Валюты и индексы",
-    footer: "Built by the PantheonX team · данные: публичные API Pacifica и Binance",
+    footer: "Ключи бирж остаются в этой вкладке и уходят только на биржу",
   },
   uk: {
     tagline: "Угода з усіх боків", net_real: "MAINNET — РЕАЛЬНІ ГРОШІ", off: "не підключена", tabs_aria: "Розділи",
-    tab_trade: "Торгівля", tab_accounts: "Акаунти", tab_market: "Ринок",
+    tab_trade: "Торгівля", tab_accounts: "Підключення", conn_sub: "Кожна біржа підключається у своїй мережі", close_aria: "Закрити", tab_market: "Ринок",
     empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Phantom (Pacifica) або API-ключ Binance.",
     empty_btn: "Підключити біржу →",
     portfolio: "Портфель", updated: "оновлено {time}", available: "доступно {amt} · {unit}",
@@ -629,7 +663,7 @@ const I18N = {
     order: "Ордер", size: "Розмір", unit_aria: "Одиниця розміру",
     hint_coin: "≈ {usd} · мін. {min} · крок {step}{cap}", hint_usd: "= {qty} {coin} · ≈ {usd} · мін. {min} · крок {step}{cap}",
     hint_cap: " · ліміт Mainnet ${cap}",
-    e_framed: "У фреймі торгівлю вимкнено.", e_connect: "Підключи {venue} у вкладці «Акаунти».",
+    e_framed: "У фреймі торгівлю вимкнено.", e_connect: "Підключи {venue} кнопкою «Підключити» вгорі.",
     e_demo: "Binance Demo не приймає ордери з браузера (CORS), тож лише перегляд. Торгувати можна на Mainnet.",
     e_nomarket: "Немає даних ринку, спробуй трохи згодом.", e_stale: "Ціни застаріли, оновлюю…",
     e_size: "Вкажи розмір більший за нуль.", e_mark: "Немає ціни ринку, спробуй трохи згодом.",
@@ -680,7 +714,7 @@ const I18N = {
     lb_h: "Топ трейдерів Pacifica", lb_trader: "Трейдер", lb_30: "PnL 30д", lb_all: "PnL за весь час", lb_vol: "Обсяг 30д", lb_eq: "Капітал",
     lb_note: "Клікни трейдера, щоб побачити його позиції. 🔒 — трейдер приховав позиції.",
     tf_h: "Не лише крипта", tf_stocks: "Акції", tf_comm: "Сировина", tf_fx: "Валюти та індекси",
-    footer: "Built by the PantheonX team · дані: публічні API Pacifica та Binance",
+    footer: "Ключі бірж залишаються в цій вкладці й ідуть лише на біржу",
   },
 };
 const LOCALE = { en: "en-GB", ru: "ru-RU", uk: "uk-UA" };
@@ -883,11 +917,13 @@ function errorText(id, e) {
 function render() { renderBadges(); renderTabs(); renderPortfolio(); renderTicket(); renderAccounts(); paintStatus(); }
 
 function renderBadges() {
-  $("badges").innerHTML = ["pacifica", "binance"].map(id => {
-    const v = venues[id];
-    return v ? `<a href="#accounts" data-go="accounts" class="badge ${netClass(v.net)}">${logo(id)}<span class="vn ${BRAND[id]}">${NAME[id]}</span><span class="nw">· ${esc(netLabel(v.net))}</span></a>`
-      : `<a href="#accounts" data-go="accounts" class="badge off">${logo(id)}<span class="vn">${NAME[id]}</span><span class="nw">· ${esc(t("off"))}</span></a>`;
-  }).join("");
+  const b = $("conn"), on = ["pacifica", "binance"].filter(id => venues[id]);
+  b.hidden = FRAMED;
+  b.className = "conn" + (on.length ? " on" : "");
+  b.setAttribute("aria-label", on.length ? t("tab_accounts") + ": " + on.map(id => NAME[id] + " " + NET_SHORT[venues[id].net]).join(", ") : t("connect"));
+  b.innerHTML = on.length
+    ? on.map(id => `<span class="chip ${netClass(venues[id].net)}" title="${NAME[id]}">${logo(id)}${esc(NET_SHORT[venues[id].net])}</span>`).join("") + (on.length < 2 ? `<span class="plus" aria-hidden="true">+</span>` : "")
+    : esc(t("connect"));
 }
 
 function renderTabs() {
@@ -895,7 +931,6 @@ function renderTabs() {
   const n = on.reduce((a, id) => a + state[id].positions.length, 0);
   $("tab-count").hidden = !n;
   $("tab-count").textContent = n;
-  $("tab-alert").hidden = FRAMED || on.length > 0;
   $("trade-empty").hidden = FRAMED || on.length > 0;
   $("top").hidden = !FRAMED && !on.length;
 }
@@ -1068,6 +1103,10 @@ async function connect(id, makeVenue) {
     const v = await makeVenue();
     if (g !== gen[id]) return; // a newer connect or a disconnect won; drop this one
     venues[id] = v;
+    if (!venues[ticketVenue]) { // point the ticket at the venue just connected, not at an empty one
+      ticketVenue = id;
+      document.querySelector(`input[name=t-venue][value=${id}]`).checked = true;
+    }
     const addr = id === "pacifica" && trader ? short(trader) : "";
     setStatus(id, () => t(id === "pacifica" ? "ph_on" : "bn_on", { addr, net: netLabel(v.net) }), true);
     show("trade");
@@ -1147,10 +1186,13 @@ if (FRAMED) {
 }
 
 // ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
-const TABS = ["trade", "accounts", "market"];
+const TABS = ["trade", "market"];
 let tab = null;
+function openConn() { if (!FRAMED && !$("conn-dlg").open) $("conn-dlg").showModal(); }
+$("conn-x").addEventListener("click", () => $("conn-dlg").close());
+$("conn-dlg").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); }); // backdrop click
 function show(name) {
-  if (FRAMED && name === "accounts") name = "trade";
+  if (name === "accounts") return openConn();
   tab = name;
   for (const b of document.querySelectorAll("#tabs [data-tab]")) b.setAttribute("aria-selected", b.dataset.tab === name);
   for (const p of document.querySelectorAll("[role=tabpanel]")) p.hidden = p.id !== "tab-" + name;
@@ -1163,6 +1205,7 @@ document.addEventListener("click", e => {
   const el = e.target.closest("[data-tab],[data-go]");
   if (!el) return;
   e.preventDefault();
+  if (el.dataset.go === "accounts") return openConn();
   show(el.dataset.tab || el.dataset.go);
   window.scrollTo(0, 0);
 });
@@ -1185,7 +1228,7 @@ setInterval(() => { if (tab === "market" && document.visibilityState === "visibl
 
 applyLang(lang);
 const fromHash = location.hash.slice(1);
-show(TABS.includes(fromHash) ? fromHash : FRAMED ? "trade" : "accounts"); // first visit: nothing is connected yet
+show(TABS.includes(fromHash) ? fromHash : "trade"); // first visit: the empty Trade card points at Connect
 loadMarkets().catch(e => { pricesErr = e; renderTradfi(); });
 loadLeaders().catch(e => { leadersErr = e; renderLeaders(); });
 </script>
