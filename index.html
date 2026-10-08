@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PantheonX</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171723'/%3E%3Cg fill='none' stroke-width='4.5' stroke-linecap='round'%3E%3Cpath d='M22.46 7.73A10.5 10.5 0 0 0 7.73 22.46' stroke='%2361D7EF'/%3E%3Cpath d='M9.54 24.27A10.5 10.5 0 0 0 24.27 9.54' stroke='%23F0B90B'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='3.6' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171723'/%3E%3Csvg x='4' y='4' width='24' height='24' viewBox='1318.8 357 238.4 238.4'%3E%3Cpath fill='%23D1CFE9' fill-rule='evenodd' d='M1423.88 432.16L1378.70 386.98C1370.45 378.73 1357.07 378.73 1348.82 386.98C1340.57 395.23 1340.57 408.61 1348.82 416.86L1363.98 432.02C1380.48 448.30 1406.96 448.46 1423.65 432.38L1423.88 432.16M1357.00 513.31L1364.00 520.31L1348.82 535.50C1340.57 543.75 1340.57 557.13 1348.82 565.38C1357.07 573.63 1370.45 573.63 1378.70 565.38L1423.96 520.12L1423.67 519.82C1407.09 503.46 1380.39 503.66 1364.06 520.26L1357.00 513.31M1527.21 386.98C1518.97 378.73 1505.58 378.73 1497.33 386.98L1444.95 439.36L1437.39 446.64C1412.95 470.19 1374.18 469.95 1350.04 446.10L1357.00 439.05L1349.99 446.05L1334.81 430.87C1318.82 414.88 1318.82 388.96 1334.81 372.97C1350.79 356.98 1376.71 356.98 1392.70 372.97L1438.02 418.28L1483.33 372.97C1499.32 356.98 1525.24 356.98 1541.22 372.97C1557.21 388.96 1557.21 414.88 1541.22 430.87L1495.91 476.18L1541.22 521.49C1557.21 537.48 1557.21 563.40 1541.22 579.39C1525.24 595.37 1499.32 595.37 1483.33 579.39L1438.02 534.07L1392.70 579.39C1376.71 595.37 1350.79 595.37 1334.81 579.39C1318.82 563.40 1318.82 537.48 1334.81 521.49L1349.97 506.33C1373.98 481.96 1413.21 481.68 1437.57 505.72L1445.02 513.06L1497.33 565.38C1505.58 573.63 1518.97 573.63 1527.21 565.38C1535.46 557.13 1535.46 543.75 1527.21 535.50L1467.90 476.18L1527.21 416.86C1535.46 408.61 1535.46 395.23 1527.21 386.98'/%3E%3C/svg%3E%3C/svg%3E">
 <style>
   @font-face { font-family: 'Montserrat'; src: url('./fonts/montserrat-latin-wght.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
   :root { color-scheme: dark;
@@ -241,6 +241,11 @@
   #fd-table td.coin { font-weight: 800; }
   #fd-table td.pos-rate { color: #ff9a9a; } #fd-table td.neg-rate { color: var(--up); }
   #fd-table td.apr { font-weight: 800; }
+  #sc-q { max-width: 320px; margin-bottom: 8px; }
+  #sc-table th button { all: unset; cursor: pointer; } #sc-table th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #sc-table th[aria-sort] { color: var(--head); }
+  #sc-table td.coin button { all: unset; cursor: pointer; font-weight: 800; } #sc-table td.coin button:hover { color: var(--accent); }
+  #sc-table td.up { color: var(--up); } #sc-table td.down { color: var(--down); }
   #fd-err { color: var(--down); }
 
   /* Market overview: read-only Pacifica mainnet, visually subordinate. */
@@ -326,6 +331,13 @@
     #fd-table td.coin { grid-row: 1; grid-column: 1 / 3; font-size: 16px; }
     #fd-table td.long { grid-row: 1; grid-column: 3 / 5; justify-self: end; }
     #fd-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
+    #sc-q { max-width: none; }
+    #sc-table, #sc-table tbody, #sc-table td { display: block; }
+    #sc-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #sc-table tr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--deep); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+    #sc-table td { border: 0; padding: 0; text-align: left; font-size: 14px; }
+    #sc-table td.coin { grid-column: 1 / 4; font-size: 16px; }
+    #sc-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
   }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
@@ -355,6 +367,7 @@
   <div class="wrap" role="tablist">
     <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
     <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
+    <button type="button" role="tab" data-tab="screener" aria-controls="tab-screener"><span data-i18n="tab_screener"></span></button>
     <button type="button" role="tab" data-tab="order-flow" aria-controls="tab-order-flow" title="Nexus Flow by PantheonX">Order Flow</button>
   </div>
 </nav>
@@ -503,6 +516,21 @@
       </section>
     </section>
   </div>
+  <div id="tab-screener" role="tabpanel" hidden>
+    <section class="panel" id="screener">
+      <div class="panel-head"><h2 data-i18n="sc_h"></h2><span data-i18n="sc_unit"></span></div>
+      <p class="sub" data-i18n="sc_sub"></p>
+      <input id="sc-q" type="search" autocomplete="off" spellcheck="false" data-i18n-ph="sc_ph" data-i18n-aria="sc_ph">
+      <div class="scroll">
+        <table id="sc-table">
+          <thead><tr id="sc-head"></tr></thead>
+          <tbody id="sc-rows"></tbody>
+        </table>
+      </div>
+      <p class="note" id="sc-state"></p>
+      <p class="note" data-i18n="sc_foot"></p>
+    </section>
+  </div>
   <div id="tab-order-flow" role="tabpanel" hidden>
     <!-- PantheonX's order-flow tool, embedded as is: their code and server, not ours. -->
     <iframe id="nexus" title="Nexus Flow" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
@@ -520,7 +548,11 @@ import { fundingRows } from "./funding.js";
 const I18N = {
   en: {
     tagline: "Every side of the trade", net_real: "MAINNET — REAL MONEY", off: "not connected", tabs_aria: "Sections",
-    tab_trade: "Trade", tab_accounts: "Connections", conn_sub: "Each exchange connects on its own network", close_aria: "Close", tab_market: "Market",
+    tab_trade: "Trade", tab_accounts: "Connections", conn_sub: "Each exchange connects on its own network", close_aria: "Close", tab_market: "Market", tab_screener: "Screener",
+    sc_h: "Screener: Binance USDT-M", sc_unit: "live · read-only", sc_sub: "Every Binance perp in one table: price, funding, open interest, CVD and liquidations. Sort by any column; tap a coin to put it in the order ticket.",
+    sc_ph: "Find a coin", sc_coin: "Coin", sc_price: "Price", sc_chg: "24h", sc_vol: "Volume 24h", sc_fund: "Funding", sc_liq: "Liq. 1h",
+    sc_state: "Showing {n} of {total} · updated {time}", sc_more: "Search to find the rest.", sc_none: "No coin matches.", sc_err: "Screener unavailable: {msg}",
+    sc_go: "Open {coin} in the order ticket", sc_foot: "Data: PantheonX screener service over Binance public streams · not advice. OI change in %, CVD and liquidations in $.",
     empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect Phantom (Pacifica) or a Binance API key first.",
     empty_btn: "Connect an exchange →",
     portfolio: "Portfolio", updated: "updated {time}", available: "available {amt} · {unit}",
@@ -588,7 +620,11 @@ const I18N = {
   },
   ru: {
     tagline: "Сделка со всех сторон", net_real: "MAINNET — РЕАЛЬНЫЕ ДЕНЬГИ", off: "не подключена", tabs_aria: "Разделы",
-    tab_trade: "Торговля", tab_accounts: "Подключения", conn_sub: "Каждая биржа подключается в своей сети", close_aria: "Закрыть", tab_market: "Рынок",
+    tab_trade: "Торговля", tab_accounts: "Подключения", conn_sub: "Каждая биржа подключается в своей сети", close_aria: "Закрыть", tab_market: "Рынок", tab_screener: "Скринер",
+    sc_h: "Скринер: Binance USDT-M", sc_unit: "онлайн · только просмотр", sc_sub: "Все фьючерсы Binance в одной таблице: цена, funding, open interest, CVD и ликвидации. Сортируй по любой колонке; нажми на монету, чтобы перенести её в тикет.",
+    sc_ph: "Найти монету", sc_coin: "Монета", sc_price: "Цена", sc_chg: "24ч", sc_vol: "Объём 24ч", sc_fund: "Funding", sc_liq: "Ликв. 1ч",
+    sc_state: "Показано {n} из {total} · обновлено {time}", sc_more: "Остальные — через поиск.", sc_none: "Нет такой монеты.", sc_err: "Скринер недоступен: {msg}",
+    sc_go: "Открыть {coin} в тикете", sc_foot: "Данные: сервис скринера PantheonX поверх публичных потоков Binance · не совет. Изменение OI в %, CVD и ликвидации в $.",
     empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Phantom (Pacifica) или API-ключ Binance.",
     empty_btn: "Подключить биржу →",
     portfolio: "Портфель", updated: "обновлено {time}", available: "доступно {amt} · {unit}",
@@ -656,7 +692,11 @@ const I18N = {
   },
   uk: {
     tagline: "Угода з усіх боків", net_real: "MAINNET — РЕАЛЬНІ ГРОШІ", off: "не підключена", tabs_aria: "Розділи",
-    tab_trade: "Торгівля", tab_accounts: "Підключення", conn_sub: "Кожна біржа підключається у своїй мережі", close_aria: "Закрити", tab_market: "Ринок",
+    tab_trade: "Торгівля", tab_accounts: "Підключення", conn_sub: "Кожна біржа підключається у своїй мережі", close_aria: "Закрити", tab_market: "Ринок", tab_screener: "Скринер",
+    sc_h: "Скринер: Binance USDT-M", sc_unit: "наживо · лише перегляд", sc_sub: "Усі ф'ючерси Binance в одній таблиці: ціна, funding, open interest, CVD і ліквідації. Сортуй за будь-якою колонкою; натисни на монету, щоб перенести її в тікет.",
+    sc_ph: "Знайти монету", sc_coin: "Монета", sc_price: "Ціна", sc_chg: "24 год", sc_vol: "Обсяг 24 год", sc_fund: "Funding", sc_liq: "Лікв. 1 год",
+    sc_state: "Показано {n} з {total} · оновлено {time}", sc_more: "Решта — через пошук.", sc_none: "Немає такої монети.", sc_err: "Скринер недоступний: {msg}",
+    sc_go: "Відкрити {coin} у тікеті", sc_foot: "Дані: сервіс скринера PantheonX поверх публічних потоків Binance · не порада. Зміна OI у %, CVD і ліквідації в $.",
     empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Phantom (Pacifica) або API-ключ Binance.",
     empty_btn: "Підключити біржу →",
     portfolio: "Портфель", updated: "оновлено {time}", available: "доступно {amt} · {unit}",
@@ -889,6 +929,7 @@ const state = { pacifica: blank(), binance: blank() }; // state[id].error holds 
 const $ = id => document.getElementById(id);
 let updatedAt = null;
 let ticketVenue = document.querySelector("input[name=t-venue]:checked").value; // the browser may restore the radio on reload
+let wantCoin = null; // coin picked on the Screener tab, applied once the ticket's venue lists it
 let unit = "usd"; // ticket size entered in dollars ("usd") or coins ("coin")
 
 const load = async v => {
@@ -1023,6 +1064,7 @@ function renderTicket() {
     sel.value = coins.includes(keep) ? keep : coins.includes("SOL") ? "SOL" : coins[0] ?? "";
     sel.dataset.key = key;
   }
+  if (wantCoin && coins.includes(wantCoin)) { sel.value = wantCoin; wantCoin = null; } // picked on the Screener tab
   $("u-coin").textContent = sel.value || "COIN";
   for (const b of document.querySelectorAll("#t-unit button")) b.setAttribute("aria-pressed", b.dataset.unit === unit);
   const c = ticketCheck();
@@ -1190,9 +1232,83 @@ if (FRAMED) {
   });
 }
 
+// ---- Screener: a /dashboard snapshot, then live patches over SSE while the tab is open.
+const SC_COLS = [ // key, header (i18n key or literal), value getter
+  ["coin", "sc_coin", r => r.coin], ["price", "sc_price", r => r.ohlcv?.close_latest],
+  ["chg", "sc_chg", r => (r.ohlcv?.close_24h ? (r.ohlcv.close_latest / r.ohlcv.close_24h - 1) * 100 : undefined)],
+  ["vol", "sc_vol", r => r.quote_volume_24h], ["fund", "sc_fund", r => (r.funding ? r.funding.close_latest * 100 : undefined)],
+  ["oi1", "OI 1h", r => r.oi?.ointerest_1h], ["oi4", "OI 4h", r => r.oi?.ointerest_4h], ["oi24", "OI 24h", r => r.oi?.ointerest_24h],
+  ["cvd1", "CVD 1h", r => r.cvd?.cvd_1h], ["cvd4", "CVD 4h", r => r.cvd?.cvd_4h], ["liq", "sc_liq", r => r.liquidations?.total_turnover_1h],
+];
+const SC_MAX = 100; // rows on screen; the rest are a search away
+const sc = { rows: null, at: null, err: null, es: null, dirty: false, sort: "vol", dir: -1, q: "" };
+
+async function openScreener() {
+  if (sc.es) return;
+  sc.es = new EventSource(SCREENER + "/stream/dashboard");
+  sc.es.addEventListener("dashboard_update", e => {
+    if (!sc.rows) return; // patches before the snapshot are covered by it
+    for (const { code, patch } of JSON.parse(e.data).updates) {
+      const r = sc.rows[code];
+      if (!r) continue;
+      for (const [k, v] of Object.entries(patch)) r[k] = v && typeof v === "object" ? { ...r[k], ...v } : v;
+    }
+    sc.at = new Date(); sc.dirty = true;
+  });
+  try {
+    const res = await fetch(SCREENER + "/dashboard");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    sc.rows = await res.json(); sc.at = new Date(); sc.err = null;
+  } catch (e) { sc.err = e; }
+  renderScreener();
+}
+function closeScreener() { sc.es?.close(); sc.es = null; sc.rows = null; } // reopening takes a fresh snapshot
+
+const pct = (n, d = 2) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(d) + "%";
+const sMoney = n => (n > 0 ? "+" : n < 0 ? "−" : "") + compact(Math.abs(n));
+function scCell(key, v, r) {
+  if (v === undefined || v === null || Number.isNaN(v)) return ["", "—"];
+  switch (key) {
+    case "price": return ["", v.toLocaleString("en-US", { minimumFractionDigits: r.precision, maximumFractionDigits: r.precision })];
+    case "vol": case "liq": return ["", compact(v)];
+    case "fund": return [cls(-v), pct(v, 4)]; // positive funding = longs pay
+    case "cvd1": case "cvd4": return [cls(v), sMoney(v)];
+    default: return [cls(v), pct(v)];
+  }
+}
+
+function renderScreener() {
+  const label = h => (h.startsWith("sc_") ? t(h) : h);
+  $("sc-head").innerHTML = SC_COLS.map(([k, h]) => `<th${k === sc.sort ? ` aria-sort="${sc.dir < 0 ? "descending" : "ascending"}"` : ""}><button type="button" data-sort="${k}">${esc(label(h))}${k === sc.sort ? (sc.dir < 0 ? " ↓" : " ↑") : ""}</button></th>`).join("");
+  const all = Object.values(sc.rows ?? {}), q = sc.q.trim().toUpperCase();
+  const get = SC_COLS.find(c => c[0] === sc.sort)[2];
+  const rows = all.filter(r => !q || r.coin.includes(q)).sort((a, b) => {
+    const x = get(a), y = get(b);
+    if (x == null || y == null) return (x == null) - (y == null); // blanks last either way
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * sc.dir;
+  });
+  $("sc-rows").innerHTML = rows.slice(0, SC_MAX).map(r => "<tr>" + SC_COLS.map(([k, h, g]) => {
+    if (k === "coin") return `<td class="coin"><button type="button" data-coin="${esc(r.coin)}" title="${esc(t("sc_go", { coin: r.coin }))}">${esc(r.coin)}</button></td>`;
+    const [c, txt] = scCell(k, g(r), r);
+    return `<td class="${c}" data-label="${esc(label(h))}">${esc(txt)}</td>`;
+  }).join("") + "</tr>").join("");
+  $("sc-state").textContent = sc.err ? t("sc_err", { msg: sc.err.message }) : !sc.rows ? t("loading")
+    : !rows.length ? t("sc_none")
+    : t("sc_state", { n: Math.min(rows.length, SC_MAX), total: rows.length, time: time(sc.at) }) + (rows.length > SC_MAX ? " " + t("sc_more") : "");
+  sc.dirty = false;
+}
+setInterval(() => { if (sc.dirty && tab === "screener") renderScreener(); }, 1000); // patches arrive every ~100 ms
+$("sc-q").addEventListener("input", e => { sc.q = e.target.value; renderScreener(); });
+$("sc-table").addEventListener("click", e => {
+  const s = e.target.closest("[data-sort]"), c = e.target.closest("[data-coin]");
+  if (s) { const k = s.dataset.sort; sc.dir = k === sc.sort ? -sc.dir : k === "coin" ? 1 : -1; sc.sort = k; renderScreener(); }
+  if (c) { wantCoin = c.dataset.coin; show("trade"); renderTicket(); window.scrollTo(0, 0); }
+});
+
 // ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
-const TABS = ["trade", "market", "order-flow"];
-const NEXUS = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com/nexus";
+const TABS = ["trade", "market", "screener", "order-flow"];
+const SCREENER = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com"; // PantheonX's service: their server, our screen
+const NEXUS = SCREENER + "/nexus";
 let tab = null;
 function openConn() { if (!FRAMED && !$("conn-dlg").open) $("conn-dlg").showModal(); }
 $("conn-x").addEventListener("click", () => $("conn-dlg").close());
@@ -1203,6 +1319,7 @@ function show(name) {
   for (const b of document.querySelectorAll("#tabs [data-tab]")) b.setAttribute("aria-selected", b.dataset.tab === name);
   for (const p of document.querySelectorAll("[role=tabpanel]")) p.hidden = p.id !== "tab-" + name;
   history.replaceState(null, "", location.pathname + location.search + "#" + name);
+  if (name === "screener") openScreener(); else closeScreener();
   if (name === "order-flow" && !$("nexus").src) $("nexus").src = NEXUS + "/?api=" + encodeURIComponent(NEXUS); // load only when first opened
   if (name === "market" && (!fund.at || Date.now() - fund.at > 60000)) loadFunding();
 }
@@ -1226,7 +1343,7 @@ function applyLang(l) {
   for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
   for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
   for (const b of document.querySelectorAll("#lang button")) b.setAttribute("aria-pressed", b.dataset.lang === lang);
-  render(); renderTradfi(); renderLeaders(); renderWallet(); renderFunding();
+  render(); renderTradfi(); renderLeaders(); renderWallet(); renderFunding(); renderScreener();
 }
 
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { refresh("pacifica"); refresh("binance"); } });
