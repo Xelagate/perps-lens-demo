@@ -1064,7 +1064,7 @@ function renderTicket() {
     sel.value = coins.includes(keep) ? keep : coins.includes("SOL") ? "SOL" : coins[0] ?? "";
     sel.dataset.key = key;
   }
-  if (wantCoin && coins.includes(wantCoin)) { sel.value = wantCoin; wantCoin = null; } // picked on the Screener tab
+  if (wantCoin && coins.length) { if (coins.includes(wantCoin)) sel.value = wantCoin; wantCoin = null; } // picked on the Screener tab; dropped if this venue lacks it
   $("u-coin").textContent = sel.value || "COIN";
   for (const b of document.querySelectorAll("#t-unit button")) b.setAttribute("aria-pressed", b.dataset.unit === unit);
   const c = ticketCheck();
@@ -1245,8 +1245,8 @@ const sc = { rows: null, at: null, err: null, es: null, dirty: false, sort: "vol
 
 async function openScreener() {
   if (sc.es) return;
-  sc.es = new EventSource(SCREENER + "/stream/dashboard");
-  sc.es.addEventListener("dashboard_update", e => {
+  const es = sc.es = new EventSource(SCREENER + "/stream/dashboard");
+  es.addEventListener("dashboard_update", e => {
     if (!sc.rows) return; // patches before the snapshot are covered by it
     for (const { code, patch } of JSON.parse(e.data).updates) {
       const r = sc.rows[code];
@@ -1258,8 +1258,10 @@ async function openScreener() {
   try {
     const res = await fetch(SCREENER + "/dashboard");
     if (!res.ok) throw new Error("HTTP " + res.status);
-    sc.rows = await res.json(); sc.at = new Date(); sc.err = null;
-  } catch (e) { sc.err = e; }
+    const rows = await res.json();
+    if (sc.es !== es) return; // tab left (or reopened) while loading
+    sc.rows = rows; sc.at = new Date(); sc.err = null;
+  } catch (e) { if (sc.es === es) sc.err = e; }
   renderScreener();
 }
 function closeScreener() { sc.es?.close(); sc.es = null; sc.rows = null; } // reopening takes a fresh snapshot
@@ -1269,7 +1271,7 @@ const sMoney = n => (n > 0 ? "+" : n < 0 ? "−" : "") + compact(Math.abs(n));
 function scCell(key, v, r) {
   if (v === undefined || v === null || Number.isNaN(v)) return ["", "—"];
   switch (key) {
-    case "price": return ["", v.toLocaleString("en-US", { minimumFractionDigits: r.precision, maximumFractionDigits: r.precision })];
+    case "price": { const d = Math.min(Math.max(r.precision | 0, 0), 8); return ["", v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })]; }
     case "vol": case "liq": return ["", compact(v)];
     case "fund": return [cls(-v), pct(v, 4)]; // positive funding = longs pay
     case "cvd1": case "cvd4": return [cls(v), sMoney(v)];
