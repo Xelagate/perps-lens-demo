@@ -247,6 +247,7 @@
   #overview { background: none; border: 1px solid var(--line); }
   #overview h2 { color: var(--muted); }
   #overview .panel { overflow-x: auto; }
+  #nexus { display: block; width: min(600px, 100%); height: calc(100dvh - 150px); min-height: 560px; margin: 0 auto 20px; border: 1px solid var(--line); border-radius: 16px; background: #0a0e14; }
   .sub { color: var(--text); font-size: 15px; margin: 0 0 18px; max-width: 640px; }
   #ticker { border-radius: 999px; background: rgba(36, 36, 51, .5); overflow: hidden; padding: 8px 0; min-height: 50px;
     mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
@@ -354,6 +355,7 @@
   <div class="wrap" role="tablist">
     <button type="button" role="tab" data-tab="trade" aria-controls="tab-trade"><span data-i18n="tab_trade"></span> <span class="count" id="tab-count" hidden></span></button>
     <button type="button" role="tab" data-tab="market" aria-controls="tab-market"><span data-i18n="tab_market"></span></button>
+    <button type="button" role="tab" data-tab="nexus" aria-controls="tab-nexus" title="Nexus Flow by PantheonX">Order Flow</button>
   </div>
 </nav>
 
@@ -500,6 +502,10 @@
         <div id="tradfi" class="groups note"></div>
       </section>
     </section>
+  </div>
+  <div id="tab-nexus" role="tabpanel" hidden>
+    <!-- PantheonX's order-flow tool, embedded as is: their code and server, not ours. -->
+    <iframe id="nexus" title="Nexus Flow" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
   </div>
 </main>
 <footer><div class="wrap" data-i18n="footer"></div></footer>
@@ -1118,7 +1124,6 @@ async function connect(id, makeVenue) {
 
 if (FRAMED) {
   $("ticket-col").hidden = true;
-  $("tab-btn-accounts").hidden = true;
   $("top").classList.add("framed");
   $("framed-note").hidden = false;
   $("pos-note").hidden = true;
@@ -1186,7 +1191,8 @@ if (FRAMED) {
 }
 
 // ---- Tabs. The current tab lives in the URL hash (survives a reload, no storage).
-const TABS = ["trade", "market"];
+const TABS = ["trade", "market", "nexus"];
+const NEXUS = "https://pantheon-screener-service-47a52e37ec37.herokuapp.com/nexus";
 let tab = null;
 function openConn() { if (!FRAMED && !$("conn-dlg").open) $("conn-dlg").showModal(); }
 $("conn-x").addEventListener("click", () => $("conn-dlg").close());
@@ -1197,6 +1203,7 @@ function show(name) {
   for (const b of document.querySelectorAll("#tabs [data-tab]")) b.setAttribute("aria-selected", b.dataset.tab === name);
   for (const p of document.querySelectorAll("[role=tabpanel]")) p.hidden = p.id !== "tab-" + name;
   history.replaceState(null, "", location.pathname + location.search + "#" + name);
+  if (name === "nexus" && !$("nexus").src) $("nexus").src = NEXUS + "/?api=" + encodeURIComponent(NEXUS); // load only when first opened
   if (name === "market" && (!fund.at || Date.now() - fund.at > 60000)) loadFunding();
 }
 document.addEventListener("click", e => {
