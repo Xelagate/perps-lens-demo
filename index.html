@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PantheonX</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#171723">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171723'/%3E%3Csvg x='4' y='4' width='24' height='24' viewBox='1318.8 357 238.4 238.4'%3E%3Cpath fill='%23D1CFE9' fill-rule='evenodd' d='M1423.88 432.16L1378.70 386.98C1370.45 378.73 1357.07 378.73 1348.82 386.98C1340.57 395.23 1340.57 408.61 1348.82 416.86L1363.98 432.02C1380.48 448.30 1406.96 448.46 1423.65 432.38L1423.88 432.16M1357.00 513.31L1364.00 520.31L1348.82 535.50C1340.57 543.75 1340.57 557.13 1348.82 565.38C1357.07 573.63 1370.45 573.63 1378.70 565.38L1423.96 520.12L1423.67 519.82C1407.09 503.46 1380.39 503.66 1364.06 520.26L1357.00 513.31M1527.21 386.98C1518.97 378.73 1505.58 378.73 1497.33 386.98L1444.95 439.36L1437.39 446.64C1412.95 470.19 1374.18 469.95 1350.04 446.10L1357.00 439.05L1349.99 446.05L1334.81 430.87C1318.82 414.88 1318.82 388.96 1334.81 372.97C1350.79 356.98 1376.71 356.98 1392.70 372.97L1438.02 418.28L1483.33 372.97C1499.32 356.98 1525.24 356.98 1541.22 372.97C1557.21 388.96 1557.21 414.88 1541.22 430.87L1495.91 476.18L1541.22 521.49C1557.21 537.48 1557.21 563.40 1541.22 579.39C1525.24 595.37 1499.32 595.37 1483.33 579.39L1438.02 534.07L1392.70 579.39C1376.71 595.37 1350.79 595.37 1334.81 579.39C1318.82 563.40 1318.82 537.48 1334.81 521.49L1349.97 506.33C1373.98 481.96 1413.21 481.68 1437.57 505.72L1445.02 513.06L1497.33 565.38C1505.58 573.63 1518.97 573.63 1527.21 565.38C1535.46 557.13 1535.46 543.75 1527.21 535.50L1467.90 476.18L1527.21 416.86C1535.46 408.61 1535.46 395.23 1527.21 386.98'/%3E%3C/svg%3E%3C/svg%3E">
 <style>
   @font-face { font-family: 'Montserrat'; src: url('./fonts/montserrat-latin-wght.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
@@ -441,7 +443,7 @@
       <div class="acc-grid">
         <article class="acc-card pac">
           <header>
-            <div class="who"><svg class="logo lg" aria-hidden="true"><use href="#logo-pacifica"/></svg><div><h3 class="vn pac">Pacifica</h3><span>Phantom · testnet</span></div></div>
+            <div class="who"><svg class="logo lg" aria-hidden="true"><use href="#logo-pacifica"/></svg><div><h3 class="vn pac">Pacifica</h3><span>Phantom / Seed Vault · testnet</span></div></div>
             <span class="badge off" id="acc-badge-pacifica"></span>
           </header>
           <p class="status" id="ph-status"></p>
@@ -550,6 +552,7 @@ import { BASES, binance, binanceVenue } from "./binance.js";
 import { PACIFICA, pacificaApi, pacificaVenue } from "./pacifica.js";
 import { checkOrder, MAINNET_CAP, STALE_MS, unknownOutcome, usdToQty } from "./ticket.js";
 import { fundingRows } from "./funding.js";
+import { connectWallet } from "./wallet.js";
 
 // ---- i18n: static dictionary (trusted). Elements: data-i18n -> textContent, data-i18n-html -> innerHTML (links only),
 // data-i18n-ph -> placeholder, data-i18n-aria -> aria-label. Dynamic text goes through t() at render time.
@@ -562,7 +565,7 @@ const I18N = {
     sc_ph: "Find a coin", sc_coin: "Coin", sc_price: "Price", sc_chg: "24h", sc_vol: "Volume 24h", sc_fund: "Funding", sc_liq: "Liq. 1h",
     sc_state: "Showing {n} of {total} · updated {time}", sc_more: "Search to find the rest.", sc_none: "No coin matches.", sc_err: "Screener unavailable: {msg}",
     sc_soon: "<b>Next: price charts</b> right here, so the trader never leaves for another app.", sc_go: "Open {coin} in the order ticket", sc_foot: "Data: PantheonX screener service over Binance public streams · not advice. OI change in %, CVD and liquidations in $.",
-    empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect Phantom (Pacifica) or a Binance API key first.",
+    empty_h: "Connect an exchange", empty_p: "Balances, positions and the order ticket show up here. Connect a Solana wallet (Pacifica) or a Binance API key first.",
     empty_btn: "Connect an exchange →",
     portfolio: "Portfolio", updated: "updated {time}", available: "available {amt} · {unit}",
     c_venue: "Venue", c_coin: "Coin", c_side: "Side", c_size: "Size", c_entry: "Entry", c_mark: "Mark", close: "Close",
@@ -581,18 +584,18 @@ const I18N = {
     e_lot: "Size is below the minimum lot of {min}.", e_notional: "The minimum order is ${min}. Increase the size.",
     e_cap: "On Mainnet an order is capped at ${cap}: this one is ≈ ${usd}.", e_usd_low: "Below the minimum: {min} {coin} ≈ {usd}.",
     t_idle: "Connect an exchange in the Accounts tab.", t_ready: "Market order. Mainnet asks for confirmation first.",
-    s_sign: "{venue}: confirm the order in Phantom…", s_sending: "{venue}: sending the order…",
+    s_sign: "{venue}: confirm the order in your wallet…", s_sending: "{venue}: sending the order…",
     s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
     st_filled: "filled", st_accepted: "accepted", st_other: "status {status}", st_close: "close", st_at: " at {px}",
     s_unknown: "{venue}: outcome unknown ({msg}). Check your positions below.",
     confirm: "{venue} · MAINNET — real money.\n{side} {qty} {coin} ≈ {usd}.\nSend the order?",
     e_bad_response: "Unexpected reply from the exchange", e_wallet_cancel: "Cancelled in the wallet.",
     connecting: "Connecting…", disconnected: "Disconnected.",
-    ph_idle: "Connect Phantom to trade. Every order is signed in your wallet.",
-    ph_on: "Connected · {addr} · orders are signed in Phantom", bn_on: "Connected · {net}",
-    ph_missing: "Phantom not found: install the Phantom extension (phantom.com) and reload. The page doesn't work as a local file, only over http(s).",
+    ph_idle: "Connect a wallet to trade. Every order is signed in your wallet.",
+    ph_on: "Connected · {addr} · orders are signed in your wallet", bn_on: "Connected · {net}",
+    ph_missing: "No Solana wallet found: install the Phantom extension (phantom.com), or on Android a wallet app, and reload. The page doesn't work as a local file, only over http(s).",
     ph_rejected: "Connection cancelled.", ph_switched: "The Phantom account changed. Connect Phantom again.",
-    ph_connect: "Connect Phantom", disconnect: "Disconnect", connect: "Connect",
+    ph_connect: "Connect wallet", disconnect: "Disconnect", connect: "Connect",
     ph_warn: "Use a separate, empty wallet only.", ph_more: "Why, and where to get test funds",
     ph_li1: "Pacifica's signature doesn't name the network and stays valid on mainnet for 30 seconds, so never sign here with a wallet that holds a real Pacifica deposit.",
     ph_li2: 'Test funds: devnet SOL and USDP at <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
@@ -635,7 +638,7 @@ const I18N = {
     sc_ph: "Найти монету", sc_coin: "Монета", sc_price: "Цена", sc_chg: "24ч", sc_vol: "Объём 24ч", sc_fund: "Funding", sc_liq: "Ликв. 1ч",
     sc_state: "Показано {n} из {total} · обновлено {time}", sc_more: "Остальные — через поиск.", sc_none: "Нет такой монеты.", sc_err: "Скринер недоступен: {msg}",
     sc_soon: "<b>Скоро: графики цены</b> прямо здесь — не нужно уходить в другое приложение.", sc_go: "Открыть {coin} в тикете", sc_foot: "Данные: сервис скринера PantheonX поверх публичных потоков Binance · не совет. Изменение OI в %, CVD и ликвидации в $.",
-    empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Phantom (Pacifica) или API-ключ Binance.",
+    empty_h: "Подключи биржу", empty_p: "Здесь будут балансы, позиции и ордер. Сначала подключи Solana-кошелёк (Pacifica) или API-ключ Binance.",
     empty_btn: "Подключить биржу →",
     portfolio: "Портфель", updated: "обновлено {time}", available: "доступно {amt} · {unit}",
     c_venue: "Биржа", c_coin: "Монета", c_side: "Сторона", c_size: "Размер", c_entry: "Вход", c_mark: "Сейчас", close: "Закрыть",
@@ -654,18 +657,18 @@ const I18N = {
     e_lot: "Размер меньше минимального лота {min}.", e_notional: "Минимальный ордер — ${min}. Увеличь размер.",
     e_cap: "На Mainnet ордер ограничен ${cap}: сейчас ≈ ${usd}.", e_usd_low: "Меньше минимума: {min} {coin} ≈ {usd}.",
     t_idle: "Подключи биржу во вкладке «Аккаунты».", t_ready: "Рыночный ордер. На Mainnet сначала будет подтверждение.",
-    s_sign: "{venue}: подтверди ордер в Phantom…", s_sending: "{venue}: отправляю ордер…",
+    s_sign: "{venue}: подтверди ордер в кошельке…", s_sending: "{venue}: отправляю ордер…",
     s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
     st_filled: "исполнен", st_accepted: "принят", st_other: "статус {status}", st_close: "закрытие", st_at: " по {px}",
     s_unknown: "{venue}: исход неизвестен ({msg}) — проверь позиции ниже.",
     confirm: "{venue} · MAINNET — реальные деньги.\n{side} {qty} {coin} ≈ {usd}.\nОтправить ордер?",
     e_bad_response: "Неожиданный ответ биржи", e_wallet_cancel: "Отменено в кошельке.",
     connecting: "Подключаюсь…", disconnected: "Отключено.",
-    ph_idle: "Подключи Phantom, чтобы торговать. Каждый ордер подписывается в кошельке.",
-    ph_on: "Подключено · {addr} · ордера подписываются в Phantom", bn_on: "Подключено · {net}",
-    ph_missing: "Phantom не найден: установи расширение Phantom (phantom.com) и обнови страницу. Как локальный файл страница не работает — только через http(s).",
+    ph_idle: "Подключи кошелёк, чтобы торговать. Каждый ордер подписывается в кошельке.",
+    ph_on: "Подключено · {addr} · ордера подписываются в кошельке", bn_on: "Подключено · {net}",
+    ph_missing: "Solana-кошелёк не найден: установи расширение Phantom (phantom.com) или, на Android, приложение кошелька, и обнови страницу. Как локальный файл страница не работает — только через http(s).",
     ph_rejected: "Подключение отменено.", ph_switched: "Кошелёк в Phantom сменился — подключи Phantom заново.",
-    ph_connect: "Подключить Phantom", disconnect: "Отключить", connect: "Подключить",
+    ph_connect: "Подключить кошелёк", disconnect: "Отключить", connect: "Подключить",
     ph_warn: "Только отдельный пустой кошелёк.", ph_more: "Почему и где взять тестовые средства",
     ph_li1: "Подпись Pacifica не указывает сеть и 30 секунд действительна и на mainnet, поэтому не подписывай здесь кошельком с реальным депозитом на Pacifica.",
     ph_li2: 'Тестовые средства: devnet SOL и USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
@@ -708,7 +711,7 @@ const I18N = {
     sc_ph: "Знайти монету", sc_coin: "Монета", sc_price: "Ціна", sc_chg: "24 год", sc_vol: "Обсяг 24 год", sc_fund: "Funding", sc_liq: "Лікв. 1 год",
     sc_state: "Показано {n} з {total} · оновлено {time}", sc_more: "Решта — через пошук.", sc_none: "Немає такої монети.", sc_err: "Скринер недоступний: {msg}",
     sc_soon: "<b>Незабаром: графіки ціни</b> просто тут — не треба йти в інший застосунок.", sc_go: "Відкрити {coin} у тікеті", sc_foot: "Дані: сервіс скринера PantheonX поверх публічних потоків Binance · не порада. Зміна OI у %, CVD і ліквідації в $.",
-    empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Phantom (Pacifica) або API-ключ Binance.",
+    empty_h: "Підключи біржу", empty_p: "Тут з'являться баланси, позиції та ордер. Спершу підключи Solana-гаманець (Pacifica) або API-ключ Binance.",
     empty_btn: "Підключити біржу →",
     portfolio: "Портфель", updated: "оновлено {time}", available: "доступно {amt} · {unit}",
     c_venue: "Біржа", c_coin: "Монета", c_side: "Сторона", c_size: "Розмір", c_entry: "Вхід", c_mark: "Зараз", close: "Закрити",
@@ -727,18 +730,18 @@ const I18N = {
     e_lot: "Розмір менший за мінімальний лот {min}.", e_notional: "Мінімальний ордер — ${min}. Збільш розмір.",
     e_cap: "На Mainnet ордер обмежено ${cap}: зараз ≈ ${usd}.", e_usd_low: "Менше за мінімум: {min} {coin} ≈ {usd}.",
     t_idle: "Підключи біржу у вкладці «Акаунти».", t_ready: "Ринковий ордер. На Mainnet спершу буде підтвердження.",
-    s_sign: "{venue}: підтверди ордер у Phantom…", s_sending: "{venue}: надсилаю ордер…",
+    s_sign: "{venue}: підтверди ордер у гаманці…", s_sending: "{venue}: надсилаю ордер…",
     s_done: "{venue}: {what} — {side} {qty} {coin}{at}{id}.",
     st_filled: "виконано", st_accepted: "прийнято", st_other: "статус {status}", st_close: "закриття", st_at: " за {px}",
     s_unknown: "{venue}: результат невідомий ({msg}). Перевір позиції нижче.",
     confirm: "{venue} · MAINNET — реальні гроші.\n{side} {qty} {coin} ≈ {usd}.\nНадіслати ордер?",
     e_bad_response: "Неочікувана відповідь біржі", e_wallet_cancel: "Скасовано в гаманці.",
     connecting: "Підключаюся…", disconnected: "Відключено.",
-    ph_idle: "Підключи Phantom, щоб торгувати. Кожен ордер підписується в гаманці.",
-    ph_on: "Підключено · {addr} · ордери підписуються в Phantom", bn_on: "Підключено · {net}",
-    ph_missing: "Phantom не знайдено: встанови розширення Phantom (phantom.com) і онови сторінку. Як локальний файл сторінка не працює, лише через http(s).",
+    ph_idle: "Підключи гаманець, щоб торгувати. Кожен ордер підписується в гаманці.",
+    ph_on: "Підключено · {addr} · ордери підписуються в гаманці", bn_on: "Підключено · {net}",
+    ph_missing: "Solana-гаманець не знайдено: встанови розширення Phantom (phantom.com) або, на Android, застосунок гаманця, і онови сторінку. Як локальний файл сторінка не працює, лише через http(s).",
     ph_rejected: "Підключення скасовано.", ph_switched: "У Phantom змінився гаманець. Підключи Phantom знову.",
-    ph_connect: "Підключити Phantom", disconnect: "Відключити", connect: "Підключити",
+    ph_connect: "Підключити гаманець", disconnect: "Відключити", connect: "Підключити",
     ph_warn: "Лише окремий порожній гаманець.", ph_more: "Чому так і де взяти тестові кошти",
     ph_li1: "Підпис Pacifica не вказує мережу і ще 30 секунд дійсний на mainnet, тож не підписуй тут гаманцем, на якому є реальний депозит Pacifica.",
     ph_li2: 'Тестові кошти: devnet SOL і USDP на <a href="https://test-app.pacifica.fi" target="_blank" rel="noopener">test-app.pacifica.fi</a> (Start Trading → Deposit).',
@@ -1182,14 +1185,11 @@ if (FRAMED) {
   $("pos-note").hidden = true;
 } else {
   $("ph-connect").onclick = async () => {
-    const phantom = window.phantom?.solana;
-    if (!phantom?.isPhantom) return setStatus("pacifica", () => t("ph_missing"));
-    let account;
-    try {
-      account = (await phantom.connect()).publicKey.toString();
-    } catch { return setStatus("pacifica", () => t("ph_rejected")); }
-    trader = account;
-    connect("pacifica", async () => pacificaVenue({ account, signMessage: async m => (await window.phantom.solana.signMessage(m, "utf8")).signature }));
+    let w;
+    try { w = await connectWallet(); } catch { return setStatus("pacifica", () => t("ph_rejected")); }
+    if (!w) return setStatus("pacifica", () => t("ph_missing"));
+    trader = w.account;
+    connect("pacifica", async () => pacificaVenue(w));
   };
   $("ph-disconnect").onclick = () => disconnect("pacifica");
 

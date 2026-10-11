@@ -14,7 +14,7 @@ export function pacificaApi(base, fetch = globalThis.fetch) {
   };
 }
 
-// signMessage: (Uint8Array) => Promise<Uint8Array> — Phantom in the page.
+// signMessage: (Uint8Array) => Promise<Uint8Array> — Phantom or Mobile Wallet Adapter (wallet.js).
 export function pacificaVenue({ account, signMessage, fetch }) {
   const api = pacificaApi(PACIFICA.testnet, fetch);
   let info;
